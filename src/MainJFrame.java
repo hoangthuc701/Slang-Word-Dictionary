@@ -37,15 +37,32 @@ import java.beans.PropertyChangeListener;
 import java.beans.PropertyChangeEvent;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
+import javax.swing.event.ListSelectionListener;
+
+import javafx.beans.value.ChangeListener;
+import javafx.beans.value.ObservableValue;
+
+import javax.swing.event.ListSelectionEvent;
+import javax.swing.JTextArea;
+import javax.swing.event.ChangeEvent;
 
 public class MainJFrame extends JFrame {
 
+	enum MODE {
+		SLANG_WORD_TO_DEFINITION,
+		DEFINITION_TO_SLANG_WORD
+	}
 	private JPanel contentPane;
 	private JTextField textField;
 	private HashMap<String, String> hashmap = new HashMap<String, String>();
+	private HashMap<String, String> hashmap_value_to_key = new HashMap<String, String>();
 	private ArrayList<String> listSlangWord = new ArrayList<String>();
 	private JList<String> list;
-
+	private JTextArea currentTextArea; 
+	private MODE currentMode;
+	private JTextArea textArea;
+	private JTextArea textArea_2;	
+	
 	/**
 	 * Launch the application.
 	 */
@@ -70,6 +87,10 @@ public class MainJFrame extends JFrame {
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		setBounds(100, 100, 1101, 523);
 
+		textArea = new JTextArea();
+		textArea.setBounds(10, 11, 629, 369);
+		currentTextArea = textArea;
+		
 		JMenuBar menuBar = new JMenuBar();
 		setJMenuBar(menuBar);
 
@@ -134,7 +155,23 @@ public class MainJFrame extends JFrame {
 		panel_1.setSize(new Dimension(210, 419));
 		contentPane.add(panel_1);
 
-		JList list = new JList(listSlangWord.toArray());
+		list = new JList(listSlangWord.toArray());
+		list.addListSelectionListener(new ListSelectionListener() {
+			public void valueChanged(ListSelectionEvent e) {
+				if (list.getSelectedValue() != null) {
+					String selected = list.getSelectedValue().toString();
+					String text = "";
+					if (currentMode == MODE.SLANG_WORD_TO_DEFINITION) {
+						text = hashmap.get(selected);
+					}
+					else 
+					{
+						text = hashmap_value_to_key.get(selected);
+					}
+					currentTextArea.setText(text);
+				}
+			}
+		});
 		list.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 		list.setVisibleRowCount(4);
 		list.setFixedCellHeight(12);
@@ -147,9 +184,7 @@ public class MainJFrame extends JFrame {
 			public void keyTyped(KeyEvent e) {
 				String keyword = textField.getText();
 				listSlangWord = searchByKey(keyword);
-				System.out.println(listSlangWord.size());
 				list.setListData(convertArrayListToStringArray(listSlangWord));
-
 			}
 		});
 
@@ -171,14 +206,32 @@ public class MainJFrame extends JFrame {
 		panel.add(btnNewButton_2);
 
 		JTabbedPane tabbedPane = new JTabbedPane(JTabbedPane.TOP);
+		tabbedPane.addChangeListener(new javax.swing.event.ChangeListener() {
+			public void stateChanged(ChangeEvent e) {
+				 if (e.getSource() instanceof JTabbedPane) {
+                     JTabbedPane pane = (JTabbedPane) e.getSource();
+                     int currentSelectedPane = pane.getSelectedIndex();
+                     MODE mode = currentSelectedPane == 0 ? MODE.SLANG_WORD_TO_DEFINITION : MODE.DEFINITION_TO_SLANG_WORD;
+                     changeMode(mode);
+                 }
+			}
+		});
 		tabbedPane.setBounds(215, 38, 654, 419);
 		contentPane.add(tabbedPane);
 
 		JPanel panel_3 = new JPanel();
 		tabbedPane.addTab("Definition - Slang", null, panel_3, null);
+		panel_3.setLayout(null);
+		
+		panel_3.add(textArea);
 
 		JPanel panel_2 = new JPanel();
 		tabbedPane.addTab("Slang - Definition", null, panel_2, null);
+		panel_2.setLayout(null);
+		
+		textArea_2 = new JTextArea();
+		textArea_2.setBounds(10, 5, 629, 375);
+		panel_2.add(textArea_2);
 
 		JPanel panel_4 = new JPanel();
 		panel_4.setBounds(869, 38, 206, 419);
@@ -194,12 +247,34 @@ public class MainJFrame extends JFrame {
 		panel_4.add(lblNewLabel);
 		panel_4.add(list1);
 	}
+	
+	public void changeMode(MODE mode) {
+		if (mode == MODE.SLANG_WORD_TO_DEFINITION) {
+			currentTextArea = textArea;
+		}
+		else {
+			currentTextArea = textArea_2;
+		}
+		currentTextArea.setText("");
+		currentMode = mode;
+		String keyword = textField.getText();
+		listSlangWord = searchByKey(keyword);
+		list.setListData(convertArrayListToStringArray(listSlangWord));
+	}
 
 	public ArrayList<String> searchByKey(String keyword) {
 		ArrayList<String> result = new ArrayList<String>();
-		hashmap.entrySet().stream().filter(e -> e.getKey().toLowerCase().contains(keyword.toLowerCase())).forEach(e -> {
-			result.add(e.getKey());
-		});
+		if (currentMode == MODE.SLANG_WORD_TO_DEFINITION) {
+			hashmap.entrySet().stream().filter(e -> e.getKey().toLowerCase().contains(keyword.toLowerCase())).forEach(e -> {
+				result.add(e.getKey());
+			});
+		}
+		else 
+		{
+			hashmap_value_to_key.entrySet().stream().filter(e -> e.getKey().toLowerCase().contains(keyword.toLowerCase())).forEach(e -> {
+				result.add(e.getKey());
+			});
+		}
 		return result;
 
 	}
@@ -221,8 +296,8 @@ public class MainJFrame extends JFrame {
 			String line = reader.readLine();
 			while (line != null) {
 				String[] parts = line.split("`");
-				System.out.println(parts[1]);
 				hashmap.put(parts[0], parts[1]);
+				hashmap_value_to_key.put(parts[1], parts[0]);
 				listSlangWord.add(parts[0]);
 				// read next line
 				line = reader.readLine();

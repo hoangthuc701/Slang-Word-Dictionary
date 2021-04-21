@@ -45,6 +45,7 @@ public class MainJFrame extends JFrame {
 	public HashMap<String, String> hashmap = new HashMap<String, String>();
 	public HashMap<String, String> hashmap_value_to_key = new HashMap<String, String>();
 	private ArrayList<String> listSlangWord = new ArrayList<String>();
+	private ArrayList<String> historySlangWord = new ArrayList<String>();
 	private JList<String> list;
 	private JTextArea currentTextArea;
 	private MODE currentMode;
@@ -52,6 +53,7 @@ public class MainJFrame extends JFrame {
 	private JRadioButton rdbtnNewRadioButton_1;
 	private JRadioButton rdbtnNewRadioButton;
 	private final ButtonGroup buttonGroup = new ButtonGroup();
+	private JList list1;
 
 	/**
 	 * Launch the application.
@@ -76,6 +78,7 @@ public class MainJFrame extends JFrame {
 		this.loadDataFromFile();
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		setBounds(100, 100, 1101, 523);
+		historySlangWord.add("");
 
 		textArea = new JTextArea();
 		textArea.setBounds(10, 11, 629, 369);
@@ -156,8 +159,16 @@ public class MainJFrame extends JFrame {
 		list.addListSelectionListener(new ListSelectionListener() {
 			public void valueChanged(ListSelectionEvent e) {
 				if (list.getSelectedValue() != null) {
+
 					String selected = list.getSelectedValue().toString();
-					String text = text = hashmap.get(selected);
+					String text = hashmap.get(selected);
+					if (historySlangWord.size() > 0) {
+						String firstWord = historySlangWord.get(0);
+						if (firstWord != selected) {
+							historySlangWord.add(0, selected);
+							list1.setListData(convertArrayListToStringArray(historySlangWord));
+						}
+					}
 					currentTextArea.setText(text);
 				}
 			}
@@ -211,7 +222,7 @@ public class MainJFrame extends JFrame {
 				if (list.getSelectedValue() != null) {
 					String slangWord = list.getSelectedValue().toString();
 					String definition = hashmap.get(slangWord);
-					
+
 					int input = JOptionPane.showConfirmDialog(null, "Do you want to delete this slang word?",
 							"Select an Option...", JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE);
 					if (input == 0) {
@@ -278,8 +289,17 @@ public class MainJFrame extends JFrame {
 		contentPane.add(panel_4);
 
 		JLabel lblNewLabel = new JLabel("History");
-		String labels1[] = { "A", "B", "C", "D", "E", "F", "G", "H", "I", "J" };
-		JList list1 = new JList(labels1);
+		String labels1[] = { "None" };
+		list1 = new JList(labels1);
+		list1.addListSelectionListener(new ListSelectionListener() {
+			public void valueChanged(ListSelectionEvent e) {
+				if (list1.getSelectedValue() != null) {
+					String selected = list1.getSelectedValue().toString();
+					String text = hashmap.get(selected);
+					currentTextArea.setText(text);
+				}
+			}
+		});
 		list1.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 		list1.setVisibleRowCount(4);
 		list1.setFixedCellHeight(12);

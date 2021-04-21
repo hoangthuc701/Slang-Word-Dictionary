@@ -1,54 +1,38 @@
-import java.awt.BorderLayout;
-import java.awt.EventQueue;
-
-import javax.swing.JFrame;
-import javax.swing.JPanel;
-import javax.swing.border.EmptyBorder;
-import javax.swing.JButton;
-import java.awt.Panel;
-import java.awt.event.ActionListener;
-import java.awt.event.ActionEvent;
-import javax.swing.JTextField;
-import java.awt.List;
-import java.awt.Scrollbar;
-import javax.swing.JList;
-import javax.swing.JTabbedPane;
-import javax.swing.JScrollPane;
-import javax.swing.JTextPane;
-import javax.swing.ListModel;
-import javax.swing.JLabel;
 import java.awt.Dimension;
-import java.awt.Component;
-import javax.swing.ListSelectionModel;
-import javax.swing.JMenuBar;
-import javax.swing.JMenu;
-import javax.swing.JMenuItem;
-import javax.swing.JOptionPane;
-
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseEvent;
+import java.awt.EventQueue;
+import java.awt.Panel;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.KeyAdapter;
+import java.awt.event.KeyEvent;
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashMap;
-import java.beans.PropertyChangeListener;
-import java.beans.PropertyChangeEvent;
-import java.awt.event.KeyAdapter;
-import java.awt.event.KeyEvent;
-import javax.swing.event.ListSelectionListener;
 
-import javafx.beans.value.ChangeListener;
-import javafx.beans.value.ObservableValue;
-
-import javax.swing.event.ListSelectionEvent;
-import javax.swing.JTextArea;
-import javax.swing.event.ChangeEvent;
-import javax.swing.JRadioButton;
 import javax.swing.ButtonGroup;
+import javax.swing.JButton;
+import javax.swing.JFrame;
+import javax.swing.JLabel;
+import javax.swing.JList;
+import javax.swing.JMenu;
+import javax.swing.JMenuBar;
+import javax.swing.JMenuItem;
+import javax.swing.JOptionPane;
+import javax.swing.JPanel;
+import javax.swing.JRadioButton;
+import javax.swing.JScrollPane;
+import javax.swing.JTabbedPane;
+import javax.swing.JTextArea;
+import javax.swing.JTextField;
+import javax.swing.ListSelectionModel;
+import javax.swing.border.EmptyBorder;
+import javax.swing.event.ChangeEvent;
+import javax.swing.event.ListSelectionEvent;
+import javax.swing.event.ListSelectionListener;
 
 public class MainJFrame extends JFrame {
 
@@ -174,7 +158,6 @@ public class MainJFrame extends JFrame {
 				if (list.getSelectedValue() != null) {
 					String selected = list.getSelectedValue().toString();
 					String text = text = hashmap.get(selected);
-					;
 					currentTextArea.setText(text);
 				}
 			}
@@ -204,6 +187,20 @@ public class MainJFrame extends JFrame {
 		btnNewButton_1.setBounds(777, 5, 89, 23);
 		btnNewButton_1.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
+				EditSlangWord screen = new EditSlangWord();
+				if (list.getSelectedValue() != null) {
+					String slangWord = list.getSelectedValue().toString();
+					String definition = hashmap.get(slangWord);
+					EditSlangWord.ReturnObject value = screen.showDialog(slangWord, definition);
+					if (value.get_status()) {
+						String newSlangWord = value.get_slang_word();
+						String newDefinition = value.get_definition();
+						UpdateSlangWord(newSlangWord, newDefinition);
+					}
+				} else {
+					JOptionPane.showMessageDialog(null, "Please select a slang word.");
+				}
+
 			}
 		});
 		panel.add(btnNewButton_1);
@@ -294,6 +291,11 @@ public class MainJFrame extends JFrame {
 			hashmap.put(slang_word, definition);
 			hashmap_value_to_key.put(definition, slang_word);
 		}
+	}
+
+	public void UpdateSlangWord(String slang_word, String definition) {
+		hashmap.replace(slang_word, definition);
+		hashmap_value_to_key.replace(definition, slang_word);
 	}
 
 	public ArrayList<String> searchByKey(String keyword) {

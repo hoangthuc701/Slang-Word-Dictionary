@@ -12,6 +12,7 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Random;
 
 import javax.swing.ButtonGroup;
 import javax.swing.JButton;
@@ -111,8 +112,8 @@ public class MainJFrame extends JFrame {
 		JMenuItem mntmNewMenuItem_5 = new JMenuItem("Slang word -> Definition");
 		mntmNewMenuItem_5.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				Game_slang_definition game_slang_def_screen = new Game_slang_definition();
-				game_slang_def_screen.setVisible(true);
+				Game_slang_definition game_slang_def_screen = new Game_slang_definition(hashmap);
+				game_slang_def_screen.playGame();
 			}
 		});
 		mnNewMenu_2.add(mntmNewMenuItem_5);
@@ -384,6 +385,17 @@ public class MainJFrame extends JFrame {
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
+	}
+
+	public ArrayList<String> generateSlangWord(int number) {
+		ArrayList<String> result = new ArrayList<String>();
+		for (int i = 0; i < number; i++) {
+			Object randomName = hashmap.keySet().toArray()[new Random().nextInt(hashmap.keySet().toArray().length)];
+			result.add(randomName.toString());
+		}
+
+		return result;
+
 	}
 
 	public void saveDataToFile() {

@@ -1,54 +1,143 @@
 import java.awt.BorderLayout;
-import java.awt.EventQueue;
+import java.awt.FlowLayout;
 
-import javax.swing.JFrame;
+import javax.swing.JButton;
+import javax.swing.JDialog;
 import javax.swing.JPanel;
 import javax.swing.border.EmptyBorder;
 import javax.swing.JTextField;
+import java.awt.event.ActionListener;
+import java.awt.event.ActionEvent;
 import javax.swing.JLabel;
 import javax.swing.JTextArea;
-import javax.swing.JButton;
+import java.awt.Color;
+import javax.swing.SwingConstants;
 
-public class AddNewSlangWord extends JFrame {
+public class AddNewSlangWord extends JDialog {
 
-	private JPanel contentPane;
+	public class ReturnObject {
+		private String _slang_word;
+		private String _definition;
+		private boolean _status;
+
+		public ReturnObject(String slang_word, String definition, boolean status) {
+			this._slang_word = slang_word;
+			this._definition = definition;
+			this._status = status;
+		}
+
+		public String get_slang_word() {
+			return _slang_word;
+		}
+
+		public String get_definition() {
+			return _definition;
+		}
+
+		public void set_slang_word(String _slang_word) {
+			this._slang_word = _slang_word;
+		}
+
+		public void set_definition(String _definition) {
+			this._definition = _definition;
+		}
+
+		public boolean get_status() {
+			return this._status;
+		}
+
+	}
+
+	private final JPanel contentPanel = new JPanel();
 	private JTextField textField;
-	
+	private JTextArea textArea;
+	private JLabel lblNewLabel_1;
+	private boolean status = false;
+
 	/**
-	 * Create the frame.
+	 * Create the dialog.
 	 */
 	public AddNewSlangWord() {
+		super((java.awt.Frame) null, true);
 		setTitle("Add ");
-		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-		setBounds(100, 100, 450, 290);
-		contentPane = new JPanel();
-		contentPane.setBorder(new EmptyBorder(5, 5, 5, 5));
-		setContentPane(contentPane);
-		contentPane.setLayout(null);
-		
-		JLabel lblNewLabel = new JLabel("Slang word");
-		lblNewLabel.setBounds(43, 29, 72, 30);
-		contentPane.add(lblNewLabel);
-		
-		textField = new JTextField();
-		textField.setBounds(125, 32, 260, 25);
-		contentPane.add(textField);
-		textField.setColumns(10);
-		
-		JLabel lblDefinition = new JLabel("Definition");
-		lblDefinition.setBounds(43, 75, 72, 30);
-		contentPane.add(lblDefinition);
-		
-		JTextArea textArea = new JTextArea();
-		textArea.setBounds(125, 78, 260, 90);
-		contentPane.add(textArea);
-		
-		JButton btnNewButton = new JButton("Save");
-		btnNewButton.setBounds(125, 192, 95, 35);
-		contentPane.add(btnNewButton);
-		
-		JButton btnCancel = new JButton("Cancel");
-		btnCancel.setBounds(230, 192, 95, 35);
-		contentPane.add(btnCancel);
+		setModalityType(java.awt.Dialog.ModalityType.APPLICATION_MODAL);
+		setBounds(100, 100, 450, 300);
+		getContentPane().setLayout(new BorderLayout());
+		contentPanel.setBorder(new EmptyBorder(5, 5, 5, 5));
+
+		getContentPane().add(contentPanel, BorderLayout.CENTER);
+		contentPanel.setLayout(null);
+		{
+			JLabel lblNewLabel = new JLabel("Slang word");
+			lblNewLabel.setBounds(31, 53, 83, 14);
+			contentPanel.add(lblNewLabel);
+		}
+		{
+			textField = new JTextField();
+			textField.setBounds(108, 50, 256, 20);
+			contentPanel.add(textField);
+			textField.setColumns(10);
+		}
+		{
+			JLabel lblDefinition = new JLabel("Definition");
+			lblDefinition.setBounds(31, 92, 83, 14);
+			contentPanel.add(lblDefinition);
+		}
+		{
+			textArea = new JTextArea();
+			textArea.setBounds(108, 92, 256, 95);
+			contentPanel.add(textArea);
+		}
+		{
+			lblNewLabel_1 = new JLabel("New label");
+			lblNewLabel_1.setHorizontalAlignment(SwingConstants.CENTER);
+			lblNewLabel_1.setForeground(Color.RED);
+			lblNewLabel_1.setBounds(31, 197, 335, 20);
+			lblNewLabel_1.setVisible(false);
+			contentPanel.add(lblNewLabel_1);
+		}
+		{
+			JPanel buttonPane = new JPanel();
+			buttonPane.setLayout(new FlowLayout(FlowLayout.RIGHT));
+			getContentPane().add(buttonPane, BorderLayout.SOUTH);
+			{
+				JButton okButton = new JButton("OK");
+				okButton.addActionListener(new ActionListener() {
+					public void actionPerformed(ActionEvent e) {
+						if (textField.getText().length() == 0) {
+							lblNewLabel_1.setText("Slang word is required.");
+							lblNewLabel_1.setVisible(true);
+							return;
+						}
+						if (textArea.getText().length() == 0) {
+							lblNewLabel_1.setText("Definition is required.");
+							lblNewLabel_1.setVisible(true);
+							return;
+						}
+						status = true;
+						setVisible(false);
+						dispose();
+					}
+				});
+				okButton.setActionCommand("OK");
+				buttonPane.add(okButton);
+				getRootPane().setDefaultButton(okButton);
+			}
+			{
+				JButton cancelButton = new JButton("Cancel");
+				cancelButton.addActionListener(new ActionListener() {
+					public void actionPerformed(ActionEvent e) {
+						dispose();
+					}
+				});
+				cancelButton.setActionCommand("Cancel");
+				buttonPane.add(cancelButton);
+			}
+		}
+	}
+
+	public ReturnObject showDialog() {
+		setVisible(true);
+		return new ReturnObject(textField.getText(), textArea.getText(), status);
 	}
 }

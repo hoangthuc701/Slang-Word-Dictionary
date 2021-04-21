@@ -23,6 +23,8 @@ import javax.swing.ListSelectionModel;
 import javax.swing.JMenuBar;
 import javax.swing.JMenu;
 import javax.swing.JMenuItem;
+import javax.swing.JOptionPane;
+
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.io.BufferedReader;
@@ -45,24 +47,28 @@ import javafx.beans.value.ObservableValue;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.JTextArea;
 import javax.swing.event.ChangeEvent;
+import javax.swing.JRadioButton;
+import javax.swing.ButtonGroup;
 
 public class MainJFrame extends JFrame {
 
 	enum MODE {
-		SLANG_WORD_TO_DEFINITION,
-		DEFINITION_TO_SLANG_WORD
+		SLANG_WORD_TO_DEFINITION, DEFINITION_TO_SLANG_WORD
 	}
+
 	private JPanel contentPane;
 	private JTextField textField;
-	private HashMap<String, String> hashmap = new HashMap<String, String>();
-	private HashMap<String, String> hashmap_value_to_key = new HashMap<String, String>();
+	public HashMap<String, String> hashmap = new HashMap<String, String>();
+	public HashMap<String, String> hashmap_value_to_key = new HashMap<String, String>();
 	private ArrayList<String> listSlangWord = new ArrayList<String>();
 	private JList<String> list;
-	private JTextArea currentTextArea; 
+	private JTextArea currentTextArea;
 	private MODE currentMode;
 	private JTextArea textArea;
-	private JTextArea textArea_2;	
-	
+	private JRadioButton rdbtnNewRadioButton_1;
+	private JRadioButton rdbtnNewRadioButton;
+	private final ButtonGroup buttonGroup = new ButtonGroup();
+
 	/**
 	 * Launch the application.
 	 */
@@ -90,7 +96,7 @@ public class MainJFrame extends JFrame {
 		textArea = new JTextArea();
 		textArea.setBounds(10, 11, 629, 369);
 		currentTextArea = textArea;
-		
+
 		JMenuBar menuBar = new JMenuBar();
 		setJMenuBar(menuBar);
 
@@ -145,6 +151,13 @@ public class MainJFrame extends JFrame {
 		btnNewButton.setBounds(683, 5, 84, 23);
 		btnNewButton.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
+				AddNewSlangWord addNewSlangWordScreen = new AddNewSlangWord();
+				AddNewSlangWord.ReturnObject value = addNewSlangWordScreen.showDialog();
+				if (value.get_status()) {
+					String newSlangWord = value.get_slang_word();
+					String newDefinition = value.get_definition();
+					AddNewSlangWord(newSlangWord, newDefinition);
+				}
 			}
 		});
 		panel.setLayout(null);
@@ -160,14 +173,8 @@ public class MainJFrame extends JFrame {
 			public void valueChanged(ListSelectionEvent e) {
 				if (list.getSelectedValue() != null) {
 					String selected = list.getSelectedValue().toString();
-					String text = "";
-					if (currentMode == MODE.SLANG_WORD_TO_DEFINITION) {
-						text = hashmap.get(selected);
-					}
-					else 
-					{
-						text = hashmap_value_to_key.get(selected);
-					}
+					String text = text = hashmap.get(selected);
+					;
 					currentTextArea.setText(text);
 				}
 			}
@@ -188,7 +195,7 @@ public class MainJFrame extends JFrame {
 			}
 		});
 
-		textField.setBounds(10, 6, 537, 20);
+		textField.setBounds(10, 6, 479, 20);
 		panel.add(textField);
 		textField.setColumns(40);
 		panel.add(btnNewButton);
@@ -205,15 +212,38 @@ public class MainJFrame extends JFrame {
 		btnNewButton_2.setBounds(876, 5, 84, 23);
 		panel.add(btnNewButton_2);
 
+		JRadioButton rdbtnNewRadioButton = new JRadioButton("Definition");
+		rdbtnNewRadioButton.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				changeMode(MODE.DEFINITION_TO_SLANG_WORD);
+			}
+		});
+		buttonGroup.add(rdbtnNewRadioButton);
+		rdbtnNewRadioButton.setBounds(586, 5, 89, 23);
+		panel.add(rdbtnNewRadioButton);
+
+		JRadioButton rdbtnNewRadioButton_1 = new JRadioButton("Slang word");
+		rdbtnNewRadioButton_1.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				changeMode(MODE.SLANG_WORD_TO_DEFINITION);
+			}
+		});
+		buttonGroup.add(rdbtnNewRadioButton_1);
+
+		rdbtnNewRadioButton_1.setSelected(true);
+		rdbtnNewRadioButton_1.setBounds(495, 5, 89, 23);
+		panel.add(rdbtnNewRadioButton_1);
+
 		JTabbedPane tabbedPane = new JTabbedPane(JTabbedPane.TOP);
 		tabbedPane.addChangeListener(new javax.swing.event.ChangeListener() {
 			public void stateChanged(ChangeEvent e) {
-				 if (e.getSource() instanceof JTabbedPane) {
-                     JTabbedPane pane = (JTabbedPane) e.getSource();
-                     int currentSelectedPane = pane.getSelectedIndex();
-                     MODE mode = currentSelectedPane == 0 ? MODE.SLANG_WORD_TO_DEFINITION : MODE.DEFINITION_TO_SLANG_WORD;
-                     changeMode(mode);
-                 }
+				if (e.getSource() instanceof JTabbedPane) {
+					JTabbedPane pane = (JTabbedPane) e.getSource();
+					int currentSelectedPane = pane.getSelectedIndex();
+					MODE mode = currentSelectedPane == 0 ? MODE.SLANG_WORD_TO_DEFINITION
+							: MODE.DEFINITION_TO_SLANG_WORD;
+					changeMode(mode);
+				}
 			}
 		});
 		tabbedPane.setBounds(215, 38, 654, 419);
@@ -222,16 +252,8 @@ public class MainJFrame extends JFrame {
 		JPanel panel_3 = new JPanel();
 		tabbedPane.addTab("Definition - Slang", null, panel_3, null);
 		panel_3.setLayout(null);
-		
-		panel_3.add(textArea);
 
-		JPanel panel_2 = new JPanel();
-		tabbedPane.addTab("Slang - Definition", null, panel_2, null);
-		panel_2.setLayout(null);
-		
-		textArea_2 = new JTextArea();
-		textArea_2.setBounds(10, 5, 629, 375);
-		panel_2.add(textArea_2);
+		panel_3.add(textArea);
 
 		JPanel panel_4 = new JPanel();
 		panel_4.setBounds(869, 38, 206, 419);
@@ -247,14 +269,9 @@ public class MainJFrame extends JFrame {
 		panel_4.add(lblNewLabel);
 		panel_4.add(list1);
 	}
-	
+
 	public void changeMode(MODE mode) {
-		if (mode == MODE.SLANG_WORD_TO_DEFINITION) {
-			currentTextArea = textArea;
-		}
-		else {
-			currentTextArea = textArea_2;
-		}
+		currentTextArea = textArea;
 		currentTextArea.setText("");
 		currentMode = mode;
 		String keyword = textField.getText();
@@ -262,18 +279,35 @@ public class MainJFrame extends JFrame {
 		list.setListData(convertArrayListToStringArray(listSlangWord));
 	}
 
+	public void AddNewSlangWord(String slang_word, String definition) {
+		boolean isExist = hashmap.get(slang_word) != null;
+		if (isExist) {
+			int input = JOptionPane.showConfirmDialog(null, "The slang word is exist. Do you want do replace it?",
+					"Select an Option...", JOptionPane.YES_NO_OPTION, JOptionPane.ERROR_MESSAGE);
+			if (input == 0) {
+				hashmap.replace(slang_word, definition);
+				hashmap_value_to_key.replace(definition, slang_word);
+			} else if (input == 1) {
+
+			}
+		} else {
+			hashmap.put(slang_word, definition);
+			hashmap_value_to_key.put(definition, slang_word);
+		}
+	}
+
 	public ArrayList<String> searchByKey(String keyword) {
 		ArrayList<String> result = new ArrayList<String>();
 		if (currentMode == MODE.SLANG_WORD_TO_DEFINITION) {
-			hashmap.entrySet().stream().filter(e -> e.getKey().toLowerCase().contains(keyword.toLowerCase())).forEach(e -> {
-				result.add(e.getKey());
-			});
-		}
-		else 
-		{
-			hashmap_value_to_key.entrySet().stream().filter(e -> e.getKey().toLowerCase().contains(keyword.toLowerCase())).forEach(e -> {
-				result.add(e.getKey());
-			});
+			hashmap.entrySet().stream().filter(e -> e.getKey().toLowerCase().contains(keyword.toLowerCase()))
+					.forEach(e -> {
+						result.add(e.getKey());
+					});
+		} else {
+			hashmap_value_to_key.entrySet().stream()
+					.filter(e -> e.getKey().toLowerCase().contains(keyword.toLowerCase())).forEach(e -> {
+						result.add(e.getValue());
+					});
 		}
 		return result;
 
@@ -308,26 +342,25 @@ public class MainJFrame extends JFrame {
 			e.printStackTrace();
 		}
 	}
-	
+
 	public void saveDataToFile() {
 		String fileName = "slang.out";
 		BufferedWriter writer;
 		try {
 			writer = new BufferedWriter(new FileWriter(fileName));
 			hashmap.entrySet().parallelStream().forEach((entry) -> {
-	            Object currentKey = entry.getKey();
-	            Object currentValue = entry.getValue();
-	            try {
-					writer.write(currentKey+"`"+currentValue);
+				Object currentKey = entry.getKey();
+				Object currentValue = entry.getValue();
+				try {
+					writer.write(currentKey + "`" + currentValue);
 				} catch (IOException e) {
 					// TODO Auto-generated catch block
 					e.printStackTrace();
 				}
-	        });
-		}
-		catch (IOException e) {
+			});
+		} catch (IOException e) {
 			e.printStackTrace();
 		}
-		
+
 	}
 }

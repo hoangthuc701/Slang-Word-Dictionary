@@ -1,54 +1,62 @@
 import java.awt.BorderLayout;
-import java.awt.EventQueue;
+import java.awt.FlowLayout;
 
 import javax.swing.JButton;
-import javax.swing.JFrame;
-import javax.swing.JLabel;
+import javax.swing.JDialog;
 import javax.swing.JPanel;
-import javax.swing.JTextArea;
-import javax.swing.JTextField;
 import javax.swing.border.EmptyBorder;
 
-public class EditSlangWord extends JFrame {
+public class EditSlangWord extends JDialog {
 
-	private JPanel contentPane;
-	private JTextField textField;
+	public class ReturnObject {
+		private String _slang_word;
+		private String _definition; 
+		public ReturnObject(String slang_word, String definition) {
+			this._slang_word = slang_word;
+			this._definition = definition;
+		}
+		public String get_slang_word() {
+			return _slang_word;
+		}
+		public String get_definition() {
+			return _definition;
+		}
+		public void set_slang_word(String _slang_word) {
+			this._slang_word = _slang_word;
+		}
+		public void set_definition(String _definition) {
+			this._definition = _definition;
+		}
+		
+	}
+	
+	private final JPanel contentPanel = new JPanel();
+
 	/**
-	 * Create the frame.
+	 * Create the dialog.
 	 */
 	public EditSlangWord() {
-		setTitle("Edit");
-		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-		setBounds(100, 100, 450, 290);
-		contentPane = new JPanel();
-		contentPane.setBorder(new EmptyBorder(5, 5, 5, 5));
-		setContentPane(contentPane);
-		contentPane.setLayout(null);
-		
-		JLabel lblNewLabel = new JLabel("Slang word");
-		lblNewLabel.setBounds(43, 29, 72, 30);
-		contentPane.add(lblNewLabel);
-		
-		textField = new JTextField();
-		textField.setBounds(125, 32, 260, 25);
-		contentPane.add(textField);
-		textField.setColumns(10);
-		
-		JLabel lblDefinition = new JLabel("Definition");
-		lblDefinition.setBounds(43, 75, 72, 30);
-		contentPane.add(lblDefinition);
-		
-		JTextArea textArea = new JTextArea();
-		textArea.setBounds(125, 78, 260, 90);
-		contentPane.add(textArea);
-		
-		JButton btnNewButton = new JButton("Save");
-		btnNewButton.setBounds(125, 192, 95, 35);
-		contentPane.add(btnNewButton);
-		
-		JButton btnCancel = new JButton("Cancel");
-		btnCancel.setBounds(230, 192, 95, 35);
-		contentPane.add(btnCancel);
+		setBounds(100, 100, 450, 300);
+		getContentPane().setLayout(new BorderLayout());
+		contentPanel.setLayout(new FlowLayout());
+		contentPanel.setBorder(new EmptyBorder(5, 5, 5, 5));
+		getContentPane().add(contentPanel, BorderLayout.CENTER);
+		{
+			JPanel buttonPane = new JPanel();
+			buttonPane.setLayout(new FlowLayout(FlowLayout.RIGHT));
+			getContentPane().add(buttonPane, BorderLayout.SOUTH);
+			{
+				JButton okButton = new JButton("OK");
+				okButton.setActionCommand("OK");
+				buttonPane.add(okButton);
+				getRootPane().setDefaultButton(okButton);
+			}
+			{
+				JButton cancelButton = new JButton("Cancel");
+				cancelButton.setActionCommand("Cancel");
+				buttonPane.add(cancelButton);
+			}
+		}
 	}
 
 }

@@ -206,6 +206,27 @@ public class MainJFrame extends JFrame {
 		panel.add(btnNewButton_1);
 
 		JButton btnNewButton_2 = new JButton("Delete");
+		btnNewButton_2.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				if (list.getSelectedValue() != null) {
+					String slangWord = list.getSelectedValue().toString();
+					String definition = hashmap.get(slangWord);
+					
+					int input = JOptionPane.showConfirmDialog(null, "Do you want to delete this slang word?",
+							"Select an Option...", JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE);
+					if (input == 0) {
+						hashmap.remove(slangWord);
+						hashmap_value_to_key.remove(definition);
+						String keyword = textField.getText();
+						listSlangWord = searchByKey(keyword);
+						list.setListData(convertArrayListToStringArray(listSlangWord));
+						currentTextArea.setText("");
+					}
+				} else {
+					JOptionPane.showMessageDialog(null, "Please select a slang word.");
+				}
+			}
+		});
 		btnNewButton_2.setBounds(876, 5, 84, 23);
 		panel.add(btnNewButton_2);
 

@@ -1,3 +1,4 @@
+import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.EventQueue;
 import java.awt.Panel;
@@ -14,6 +15,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Random;
 
+import javax.swing.AbstractButton;
 import javax.swing.ButtonGroup;
 import javax.swing.JButton;
 import javax.swing.JFrame;
@@ -55,6 +57,8 @@ public class MainJFrame extends JFrame {
 	private JRadioButton rdbtnNewRadioButton;
 	private final ButtonGroup buttonGroup = new ButtonGroup();
 	private JList list1;
+	private AbstractButton JtmNewMenuItem_6;
+	private JMenuItem mntmNewMenuItem_6;
 
 	/**
 	 * Launch the application.
@@ -75,7 +79,8 @@ public class MainJFrame extends JFrame {
 	/**
 	 * Create the frame.
 	 */
-	public MainJFrame() {
+	public MainJFrame(){
+		
 		this.loadDataFromFile();
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		setBounds(100, 100, 1101, 523);
@@ -83,6 +88,8 @@ public class MainJFrame extends JFrame {
 
 		textArea = new JTextArea();
 		textArea.setBounds(10, 11, 629, 369);
+		textArea.setEnabled(true);
+		textArea.setEditable(false);
 		currentTextArea = textArea;
 
 		JMenuBar menuBar = new JMenuBar();
@@ -118,13 +125,26 @@ public class MainJFrame extends JFrame {
 		});
 		mnNewMenu_2.add(mntmNewMenuItem_5);
 
-		JMenuItem mntmNewMenuItem_6 = new JMenuItem("Definition -> Slang word  ");
+		
+		mntmNewMenuItem_6 = new JMenuItem("Definition -> Slang word  ");
+		mntmNewMenuItem_6.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				Game_Definition_Slang game_slang_def_screen = new Game_Definition_Slang(hashmap_value_to_key);
+				game_slang_def_screen.playGame();
+			}
+		});
 		mnNewMenu_2.add(mntmNewMenuItem_6);
 
 		JMenu mnNewMenu_3 = new JMenu("Help");
 		menuBar.add(mnNewMenu_3);
 
 		JMenuItem mntmNewMenuItem_7 = new JMenuItem("About");
+		mntmNewMenuItem_7.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				About about_screen = new About();
+				about_screen.setVisible(true);
+			}
+		});
 		mnNewMenu_3.add(mntmNewMenuItem_7);
 		contentPane = new JPanel();
 		contentPane.setBorder(new EmptyBorder(5, 5, 5, 5));

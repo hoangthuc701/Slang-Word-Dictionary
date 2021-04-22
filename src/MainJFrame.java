@@ -8,9 +8,16 @@ import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.io.RandomAccessFile;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Random;
@@ -79,8 +86,8 @@ public class MainJFrame extends JFrame {
 	/**
 	 * Create the frame.
 	 */
-	public MainJFrame(){
-		
+	public MainJFrame() {
+
 		this.loadDataFromFile();
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		setBounds(100, 100, 1101, 523);
@@ -99,18 +106,31 @@ public class MainJFrame extends JFrame {
 		menuBar.add(mnNewMenu);
 
 		JMenuItem mntmNewMenuItem = new JMenuItem("Exit");
+		mntmNewMenuItem.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				saveDataToFile();
+				try {
+					copyToBackUp();
+				} catch (IOException e1) {
+					// TODO Auto-generated catch block
+					e1.printStackTrace();
+				}
+				dispose();
+			}
+		});
 		mnNewMenu.add(mntmNewMenuItem);
 
 		JMenu mnNewMenu_1 = new JMenu("Dictionary");
 		menuBar.add(mnNewMenu_1);
 
-		JMenuItem mntmNewMenuItem_2 = new JMenuItem("Import");
-		mnNewMenu_1.add(mntmNewMenuItem_2);
-
-		JMenuItem mntmNewMenuItem_3 = new JMenuItem("Export");
-		mnNewMenu_1.add(mntmNewMenuItem_3);
-
 		JMenuItem mntmNewMenuItem_4 = new JMenuItem("Reset");
+		mntmNewMenuItem_4.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				hashmap = new HashMap<String, String>();
+				hashmap_value_to_key = new HashMap<String, String>();
+				resetData();
+			}
+		});
 		mnNewMenu_1.add(mntmNewMenuItem_4);
 
 		JMenu mnNewMenu_2 = new JMenu("Game");
@@ -125,7 +145,6 @@ public class MainJFrame extends JFrame {
 		});
 		mnNewMenu_2.add(mntmNewMenuItem_5);
 
-		
 		mntmNewMenuItem_6 = new JMenuItem("Definition -> Slang word  ");
 		mntmNewMenuItem_6.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
@@ -386,8 +405,30 @@ public class MainJFrame extends JFrame {
 		return str;
 	}
 
+	public void resetData() {
+		String fileName = "slang.backup";
+		BufferedReader reader;
+		try {
+			reader = new BufferedReader(new FileReader(fileName));
+			String line = reader.readLine();
+			while (line != null) {
+				String[] parts = line.split("`");
+				hashmap.put(parts[0], parts[1]);
+				hashmap_value_to_key.put(parts[1], parts[0]);
+				listSlangWord.add(parts[0]);
+				// read next line
+				line = reader.readLine();
+			}
+			reader.close();
+
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+
+	}
+
 	public void loadDataFromFile() {
-		String fileName = "slang.txt";
+		String fileName = "slang.data";
 		BufferedReader reader;
 		try {
 			reader = new BufferedReader(new FileReader(fileName));
@@ -418,16 +459,30 @@ public class MainJFrame extends JFrame {
 
 	}
 
+	public void removeLastLine() throws IOException {
+//		String fileName = "slang.data";
+//		RandomAccessFile f = new RandomAccessFile(fileName, "rw");
+//		long length = f.length() - 1;
+//		byte b;
+//		do {                     
+//		  length -= 1;
+//		   f.seek(length);
+//		   b = f.readByte();
+//		} while(b != 10);
+//		f.setLength(length+1);
+//		f.close();
+	}
+
 	public void saveDataToFile() {
-		String fileName = "slang.out";
+		String fileName = "slang.data";
 		BufferedWriter writer;
 		try {
 			writer = new BufferedWriter(new FileWriter(fileName));
 			hashmap.entrySet().parallelStream().forEach((entry) -> {
-				Object currentKey = entry.getKey();
-				Object currentValue = entry.getValue();
+				String currentKey = entry.getKey().toString();
+				String currentValue = entry.getValue().toString();
 				try {
-					writer.write(currentKey + "`" + currentValue);
+					writer.write(currentKey + "`" + currentValue + "\n");
 				} catch (IOException e) {
 					// TODO Auto-generated catch block
 					e.printStackTrace();
@@ -437,5 +492,18 @@ public class MainJFrame extends JFrame {
 			e.printStackTrace();
 		}
 
+	}
+
+	public void copyToBackUp() throws IOException {
+		InputStream in = new FileInputStream(new File("slang.data"));
+		OutputStream out = new FileOutputStream(new File("slang.backup"));
+		byte[] buf = new byte[1024];
+		int len;
+
+		while ((len = in.read(buf)) > 0) {
+			out.write(buf, 0, len);
+		}
+		in.close();
+		out.close();
 	}
 }

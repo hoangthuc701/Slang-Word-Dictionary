@@ -131,6 +131,17 @@ public class MainJFrame extends JFrame {
 				resetData();
 			}
 		});
+		
+		JMenuItem mntmNewMenuItem_1 = new JMenuItem("Random Slang word");
+		mntmNewMenuItem_1.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				Object randomName = hashmap.keySet().toArray()[new Random().nextInt(hashmap.keySet().toArray().length)];
+				String slang_word = randomName.toString();
+				String mean = hashmap.get(slang_word);
+				JOptionPane.showMessageDialog(null,slang_word + ": "+mean);
+			}
+		});
+		mnNewMenu_1.add(mntmNewMenuItem_1);
 		mnNewMenu_1.add(mntmNewMenuItem_4);
 
 		JMenu mnNewMenu_2 = new JMenu("Game");
@@ -184,6 +195,13 @@ public class MainJFrame extends JFrame {
 					String newSlangWord = value.get_slang_word();
 					String newDefinition = value.get_definition();
 					AddNewSlangWord(newSlangWord, newDefinition);
+				}
+				saveDataToFile();
+				try {
+					copyToBackUp();
+				} catch (IOException e1) {
+					// TODO Auto-generated catch block
+					e1.printStackTrace();
 				}
 			}
 		});
@@ -248,6 +266,13 @@ public class MainJFrame extends JFrame {
 						String newDefinition = value.get_definition();
 						UpdateSlangWord(newSlangWord, newDefinition);
 					}
+					saveDataToFile();
+					try {
+						copyToBackUp();
+					} catch (IOException e1) {
+						// TODO Auto-generated catch block
+						e1.printStackTrace();
+					}
 				} else {
 					JOptionPane.showMessageDialog(null, "Please select a slang word.");
 				}
@@ -272,6 +297,13 @@ public class MainJFrame extends JFrame {
 						listSlangWord = searchByKey(keyword);
 						list.setListData(convertArrayListToStringArray(listSlangWord));
 						currentTextArea.setText("");
+					}
+					saveDataToFile();
+					try {
+						copyToBackUp();
+					} catch (IOException e1) {
+						// TODO Auto-generated catch block
+						e1.printStackTrace();
 					}
 				} else {
 					JOptionPane.showMessageDialog(null, "Please select a slang word.");
